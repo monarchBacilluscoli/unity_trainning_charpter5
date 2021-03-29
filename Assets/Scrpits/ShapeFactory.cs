@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// 用于生成Shape的asset
@@ -30,6 +31,11 @@ public class ShapeFactory : ScriptableObject
     #endregion // 设置参数
 
     #region 中间变量
+
+    /// <summary>
+    /// 用于存储
+    /// </summary>
+    Scene m_poolScene;
 
     /// <summary>
     /// 用于回收对象的回收池
@@ -67,6 +73,10 @@ public class ShapeFactory : ScriptableObject
             {
                 instance = Instantiate(m_prefabs[shapeId]);
                 instance.ShapeId = shapeId;
+                //todo 当需要真正创建新的对象的时候（初次创建）才会需要移动到别的scene
+                SceneManager.MoveGameObjectToScene(
+                    instance.gameObject, m_poolScene
+                );
             }
         }
         else
@@ -100,6 +110,28 @@ public class ShapeFactory : ScriptableObject
         {
             m_pools[i] = new List<Shape>();
         }
+        //todo 检查当前场景是否存在，用于处理recompilation
+        if (Application.isEditor)
+        {
+            m_poolScene = SceneManager.GetSceneByName(name);
+            if (m_poolScene.isLoaded)
+            {
+                //todo 获取所有的根对象，重建回收池（因为回收池并不进行序列化）
+                GameObject[] rootObjects = m_poolScene.GetRootGameObjects();
+                for (int i = 0; i < rootObjects.Length; i++)
+                {
+                    //todo 检查对象，添加到相对应的池中
+                    Shape pooledShape = rootObjects[i].GetComponent<Shape>();
+                    if (!pooledShape.gameObject.activeSelf)
+                    {
+                        m_pools[pooledShape.ShapeId].Add(pooledShape);
+                    }
+                }
+                return;
+            }
+        }
+        //todo 如果不存在方重建
+        m_poolScene = SceneManager.CreateScene(name);
     }
 
     /// <summary>

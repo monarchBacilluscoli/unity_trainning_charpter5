@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 //! 不要把它看成manager，它就是game! Save它就是save game!
 /// <summary>
@@ -99,10 +101,22 @@ public class Game : PersistableObject
     /// <summary>
     /// 初始化时被调用
     /// </summary>
-    void Awake()
+    void Start()
     {
         // 初始化记录列表
         m_shapes = new List<Shape>();
+
+        if (Application.isEditor)
+        {
+            Scene loadedLevel = SceneManager.GetSceneByName("Level1");
+            if (loadedLevel.isLoaded)
+            {
+                SceneManager.SetActiveScene(loadedLevel);
+                return;
+            }
+        }
+
+        StartCoroutine(LoadLevel1());
     }
 
     /// <summary>
@@ -138,7 +152,7 @@ public class Game : PersistableObject
         }
         // 时间到，创生
         m_creationProgress += Time.deltaTime * CreationSpeed;
-        while (m_creationProgress >= 1f)
+        while (m_creationProgress >= 1.0f)
         {
             m_creationProgress -= 1f;
             CreateShape();
@@ -251,5 +265,16 @@ public class Game : PersistableObject
             m_shapes[index] = m_shapes[lastIndex];
             m_shapes.RemoveAt(lastIndex);
         }
+    }
+
+    IEnumerator LoadLevel1()
+    {
+        //todo 令该组件失效从而避免玩家在未加载时进行操作
+        enabled = false;
+        yield return SceneManager.LoadSceneAsync("Level1", LoadSceneMode.Additive);
+        //todo 等待yield执行完毕耽搁执行后面的语句
+        SceneManager.SetActiveScene(SceneManager.GetSceneByName("Level1"));
+        //todo 当带有light的场景加载完毕，设定当前组件起效
+        enabled = true;
     }
 }
