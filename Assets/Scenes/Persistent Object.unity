@@ -398,6 +398,7 @@ MonoBehaviour:
   m_loadKey: 108
   m_destoryKey: 120
   m_storage: {fileID: 170771030}
+  levelCount: 2
 --- !u!1 &490879412
 GameObject:
   m_ObjectHideFlags: 0

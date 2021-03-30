@@ -49,11 +49,18 @@ public class Game : PersistableObject
     /// <remarks>
     /// 随存档格式更新++
     /// </remarks>
-    const int m_saveVersion = 1;
+    const int m_saveVersion = 2;
+
+    /// <summary>
+    /// 关卡总数
+    /// </summary>
+    public int m_levelCount;
 
     #endregion // 设置
 
     #region 中间变量
+
+    int loadedLevelBuildIndex;
 
     /// <summary>
     /// 记录所有对象的位置
@@ -105,18 +112,23 @@ public class Game : PersistableObject
     {
         // 初始化记录列表
         m_shapes = new List<Shape>();
+        m_levelCount = SceneManager.sceneCountInBuildSettings - 1;
 
         if (Application.isEditor)
         {
-            Scene loadedLevel = SceneManager.GetSceneByName("Level1");
-            if (loadedLevel.isLoaded)
+            for (int i = 0; i < SceneManager.sceneCount; i++)
             {
-                SceneManager.SetActiveScene(loadedLevel);
-                return;
+                Scene loadedScene = SceneManager.GetSceneAt(i);
+                if (loadedScene.name.Contains("Level"))
+                {
+                    SceneManager.SetActiveScene(loadedScene);
+                    loadedLevelBuildIndex = loadedScene.buildIndex;
+                    return;
+                }
             }
         }
-
-        StartCoroutine(LoadLevel1());
+        //todo 开启异步任务
+        StartCoroutine(LoadLevel(1));
     }
 
     /// <summary>
@@ -149,6 +161,19 @@ public class Game : PersistableObject
         else if (Input.GetKey(m_destoryKey))
         {
             DestroyShape();
+        }
+        else
+        {
+            //todo 如果按下数字键，则加载对应index的关卡
+            for (int i = 0; i <= m_levelCount; i++)
+            {
+                if (Input.GetKeyDown(KeyCode.Alpha0 + i))
+                {
+                    StartCoroutine(LoadLevel(i));
+                    BeginNewGame();
+                    return;
+                }
+            }
         }
         // 时间到，创生
         m_creationProgress += Time.deltaTime * CreationSpeed;
@@ -191,6 +216,9 @@ public class Game : PersistableObject
     /// <summary>
     /// 开始新游戏
     /// </summary>
+    /// <remarks>
+    /// 负责先前物体的清理工作
+    /// </remarks>
     void BeginNewGame()
     {
         // 摧毁所有记录的对象
@@ -213,6 +241,8 @@ public class Game : PersistableObject
     {
         //todo 存储存档版本
         writer.Write(m_shapes.Count);
+        //todo 写入关卡build编号
+        writer.Write(loadedLevelBuildIndex);
         for (int i = 0; i < m_shapes.Count; i++)
         {
             //todo 存储shapeId
@@ -240,6 +270,7 @@ public class Game : PersistableObject
         }
         //todo 检查是否为存档版本
         int count = version < 0 ? -version : reader.ReadInt();
+        StartCoroutine(LoadLevel(version < 2 ? 1 : reader.ReadInt()));
         for (int s = 0; s < count; s++)
         {
             //todo 读取并设置shapId
@@ -267,14 +298,25 @@ public class Game : PersistableObject
         }
     }
 
-    IEnumerator LoadLevel1()
+    /// <summary>
+    /// 异步加载特定build index的关卡
+    /// </summary>
+    /// <param name="levelBuildIndex">关卡的build index</param>
+    /// <returns>枚举器，用于协程</returns>
+    IEnumerator LoadLevel(int levelBuildIndex)
     {
         //todo 令该组件失效从而避免玩家在未加载时进行操作
         enabled = false;
-        yield return SceneManager.LoadSceneAsync("Level1", LoadSceneMode.Additive);
+        //todo 加载新场景前先关闭原有场景
+        if (loadedLevelBuildIndex > 0)
+        {
+            SceneManager.UnloadSceneAsync(loadedLevelBuildIndex);
+        }
+        yield return SceneManager.LoadSceneAsync(levelBuildIndex, LoadSceneMode.Additive);
         //todo 等待yield执行完毕耽搁执行后面的语句
-        SceneManager.SetActiveScene(SceneManager.GetSceneByName("Level1"));
-        //todo 当带有light的场景加载完毕，设定当前组件起效
+        SceneManager.SetActiveScene(SceneManager.GetSceneByBuildIndex(levelBuildIndex));
+        loadedLevelBuildIndex = levelBuildIndex;
+        //todo 当带有light的场景加载完毕，设定当前脚本起效
         enabled = true;
     }
 }
