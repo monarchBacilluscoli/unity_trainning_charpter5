@@ -97,7 +97,8 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 0}
+  m_LightingDataAsset: {fileID: 112000002, guid: 959ea3e72010b174ba3db922c7fb3c58,
+    type: 2}
   m_UseShadowmask: 1
 --- !u!196 &4
 NavMeshSettings:
@@ -391,6 +392,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5474747c660e4b2489cc2bbce7578c3c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_creationSpeedSlider: {fileID: 1157816328}
+  m_destructionSpeedSlider: {fileID: 1878458055}
+  m_reseedOnLoad: 0
   m_shapeFactory: {fileID: 11400000, guid: 13fc447e70304584ba00dce8063cf695, type: 2}
   m_createKey: 99
   m_newGameKey: 110
@@ -398,7 +402,7 @@ MonoBehaviour:
   m_loadKey: 108
   m_destoryKey: 120
   m_storage: {fileID: 170771030}
-  levelCount: 2
+  m_levelCount: 0
 --- !u!1 &490879412
 GameObject:
   m_ObjectHideFlags: 0
@@ -411,7 +415,7 @@ GameObject:
   - component: {fileID: 490879415}
   - component: {fileID: 490879414}
   m_Layer: 5
-  m_Name: Creation Speed Label (1)
+  m_Name: Destruction Speed Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1141,7 +1145,7 @@ GameObject:
   - component: {fileID: 1878458054}
   - component: {fileID: 1878458055}
   m_Layer: 5
-  m_Name: Creation Speed Slider (1)
+  m_Name: Destruction Speed Slider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

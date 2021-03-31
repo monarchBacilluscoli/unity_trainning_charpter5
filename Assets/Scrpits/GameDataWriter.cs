@@ -65,4 +65,10 @@ public class GameDataWriter
         m_writer.Write(value.b);
         m_writer.Write(value.a);
     }
+
+    public void Write(Random.State value)
+    {
+        Debug.Log(JsonUtility.ToJson(value));
+        m_writer.Write(JsonUtility.ToJson(value));
+    }
 }

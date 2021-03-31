@@ -61,10 +61,10 @@ public class ShapeFactory : ScriptableObject
             }
             List<Shape> pool = m_pools[shapeId];
             int lastIndex = pool.Count - 1;
-            //todo 如果对应的pool中有物体
+            // 如果对应的pool中有物体
             if (lastIndex >= 0)
             {
-                //todo 提取pool中的最后一个物体并activate之
+                // 提取pool中的最后一个物体并activate之
                 instance = pool[lastIndex];
                 instance.gameObject.SetActive(true);
                 pool.RemoveAt(lastIndex);
@@ -73,7 +73,7 @@ public class ShapeFactory : ScriptableObject
             {
                 instance = Instantiate(m_prefabs[shapeId]);
                 instance.ShapeId = shapeId;
-                //todo 当需要真正创建新的对象的时候（初次创建）才会需要移动到别的scene
+                // 当需要真正创建新的对象的时候（初次创建）才会需要移动到别的scene
                 SceneManager.MoveGameObjectToScene(
                     instance.gameObject, m_poolScene
                 );
@@ -81,9 +81,9 @@ public class ShapeFactory : ScriptableObject
         }
         else
         {
-            //todo 生成对象
+            // 生成对象
             instance = Instantiate(m_prefabs[shapeId]);
-            //todo 设置ID
+            // 设置ID
             instance.ShapeId = shapeId;
         }
         instance.SetMaterial(m_materials[materialId], materialId);
@@ -110,17 +110,17 @@ public class ShapeFactory : ScriptableObject
         {
             m_pools[i] = new List<Shape>();
         }
-        //todo 检查当前场景是否存在，用于处理recompilation
+        // 检查当前场景是否存在，用于处理recompilation
         if (Application.isEditor)
         {
             m_poolScene = SceneManager.GetSceneByName(name);
             if (m_poolScene.isLoaded)
             {
-                //todo 获取所有的根对象，重建回收池（因为回收池并不进行序列化）
+                // 获取所有的根对象，重建回收池（因为回收池并不进行序列化）
                 GameObject[] rootObjects = m_poolScene.GetRootGameObjects();
                 for (int i = 0; i < rootObjects.Length; i++)
                 {
-                    //todo 检查对象，添加到相对应的池中
+                    // 检查对象，添加到相对应的池中
                     Shape pooledShape = rootObjects[i].GetComponent<Shape>();
                     if (!pooledShape.gameObject.activeSelf)
                     {
@@ -130,7 +130,7 @@ public class ShapeFactory : ScriptableObject
                 return;
             }
         }
-        //todo 如果不存在方重建
+        // 如果不存在方重建
         m_poolScene = SceneManager.CreateScene(name);
     }
 
@@ -141,12 +141,12 @@ public class ShapeFactory : ScriptableObject
     {
         if (m_recycle)
         {
-            //todo 检查并新建回收池
+            // 检查并新建回收池
             if (m_pools == null)
             {
                 CreatePools();
             }
-            //todo 加入待回收对象
+            // 加入待回收对象
             m_pools[shapeToRecycle.ShapeId].Add(shapeToRecycle);
             shapeToRecycle.gameObject.SetActive(false);
         }

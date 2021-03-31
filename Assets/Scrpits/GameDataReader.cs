@@ -81,4 +81,14 @@ public class GameDataReader
         value.a = m_reader.ReadSingle();
         return value;
     }
+
+    /// <summary>
+    /// 读取存档中的随机数状态
+    /// </summary>
+    /// <returns>存档中的随机状态</returns>
+    public Random.State ReadRandomState()
+    {
+        // 读JsonUtility出来的string，并将之转换为Random.state
+        return JsonUtility.FromJson<Random.State>(m_reader.ReadString());
+    }
 }

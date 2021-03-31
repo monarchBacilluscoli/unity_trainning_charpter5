@@ -11,7 +11,7 @@ public class PersistableObject : MonoBehaviour
     /// </summary>
     public virtual void Save(GameDataWriter writer)
     {
-        //todo 存储当前物体位置、旋转和缩放
+        // 存储当前物体位置、旋转和缩放
         writer.Write(transform.localPosition);
         writer.Write(transform.localRotation);
         writer.Write(transform.localScale);
@@ -23,7 +23,7 @@ public class PersistableObject : MonoBehaviour
     /// <param name="reader">存档读取器</param>
     public virtual void Load(GameDataReader reader)
     {
-        //todo 读取当前物体位置、旋转和缩放
+        // 读取当前物体位置、旋转和缩放
         transform.localPosition = reader.ReadVector3();
         transform.localRotation = reader.ReadQuaternion();
         transform.localScale = reader.ReadVector3();

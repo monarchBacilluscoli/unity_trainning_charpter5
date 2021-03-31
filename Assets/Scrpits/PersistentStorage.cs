@@ -39,10 +39,11 @@ public class PersistentStorage : MonoBehaviour
     /// <param name="o">待读取的个体</param>
     public void Load(PersistableObject o)
     {
-        using (var reader = new BinaryReader(File.Open(m_savePath, FileMode.Open)))
-        {
-            // 在进行任何读取存档操作前，先读取版本号并传递给reader
-            o.Load(new GameDataReader(reader, -reader.ReadInt32()));
-        }
+        // 将所有数据读到内存数组
+        byte[] data = File.ReadAllBytes(m_savePath);
+        // 创建内存流用数组初始化，并构建基于内存的BinaryReader
+        var reader = new BinaryReader(new MemoryStream(data));
+        // 按原样应用存档数据
+        o.Load(new GameDataReader(reader, -reader.ReadInt32()));
     }
 }
